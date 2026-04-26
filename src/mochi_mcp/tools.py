@@ -1,7 +1,9 @@
+from fastmcp import FastMCP
+
 from mochi_mcp.client import MochiClient
 
 
-def register_tools(mcp, client: MochiClient) -> None:
+def register_tools(mcp: FastMCP, client: MochiClient) -> None:
     @mcp.tool
     def list_decks() -> list[dict]:
         """List all Mochi decks."""

@@ -11,6 +11,12 @@ class MochiClient:
             transport=transport,
         )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self._http.close()
+
     def _get(self, path: str, params: dict | None = None) -> dict:
         try:
             response = self._http.get(path, params=params or {})
