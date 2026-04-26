@@ -28,7 +28,29 @@ class MochiClient:
         return self._get(f"cards/{card_id}")
 
     def list_decks(self) -> list[dict]:
-        raise NotImplementedError
+        results: list[dict] = []
+        params: dict = {}
+        while True:
+            data = self._get("decks", params=params)
+            docs = data.get("docs", [])
+            results.extend(docs)
+            bookmark = data.get("bookmark")
+            if not docs or not bookmark:
+                break
+            params = {"bookmark": bookmark}
+        return results
 
     def list_cards(self, deck_id: str | None = None) -> list[dict]:
-        raise NotImplementedError
+        results: list[dict] = []
+        params: dict = {}
+        if deck_id:
+            params["deck-id"] = deck_id
+        while True:
+            data = self._get("cards", params=params)
+            docs = data.get("docs", [])
+            results.extend(docs)
+            bookmark = data.get("bookmark")
+            if not docs or not bookmark:
+                break
+            params = {**params, "bookmark": bookmark}
+        return results
