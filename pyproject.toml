@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mochi-mcp"
+version = "0.1.0"
+description = "MCP server for the Mochi Cards API"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp>=2",
+    "httpx",
+]
+
+[project.scripts]
+mochi-mcp = "mochi_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mochi_mcp"]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
