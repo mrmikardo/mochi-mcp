@@ -83,3 +83,9 @@ def test_list_cards_paginates_with_deck_filter_preserved():
     assert result == [{"id": "c1"}, {"id": "c2"}]
     assert transport.requests[1].url.params.get("deck-id") == "deck-1"
     assert transport.requests[1].url.params.get("bookmark") == "cursor1"
+
+
+def test_http_error_raises_readable_exception():
+    client, _ = make_client([{"status_code": 401, "json": {"error": "Unauthorized"}}])
+    with pytest.raises(Exception, match="Mochi API returned 401"):
+        client.get_deck("d1")
