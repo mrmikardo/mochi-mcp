@@ -65,7 +65,7 @@ def test_get_card_tool_delegates_to_client():
     client.get_card.assert_called_once_with("c1")
 
 
-def test_tools_return_api_keys_to_mcp_clients():
+def test_tools_return_python_field_names_to_mcp_clients():
     mcp = FastMCP("test")
     client = MagicMock(spec=MochiClient)
     client.get_deck.return_value = Deck.model_validate(
@@ -78,5 +78,6 @@ def test_tools_return_api_keys_to_mcp_clients():
             return await mcp_client.call_tool("get_deck", {"deck_id": "d1"})
 
     result = asyncio.run(call())
-    assert result.structured_content["archived?"] is True
-    assert result.structured_content["parent-id"] == "d0"
+    assert result.structured_content["archived"] is True
+    assert result.structured_content["parent_id"] == "d0"
+    assert "archived?" not in result.structured_content

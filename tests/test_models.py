@@ -101,10 +101,12 @@ def test_unknown_keys_are_preserved():
     assert deck.model_dump(by_alias=True)["new-api-field"] == 1
 
 
-def test_models_serialize_back_to_api_keys():
+def test_models_serialize_to_python_field_names():
     dumped = Deck.model_validate(DECK_JSON).model_dump(mode="json", exclude_none=True)
-    assert dumped["archived?"] is True
-    assert dumped["parent-id"] == "HJBMBGBO"
+    assert dumped["archived"] is True
+    assert dumped["parent_id"] == "HJBMBGBO"
+    assert "archived?" not in dumped
+    assert "parent-id" not in dumped
 
 
 def test_page_parses_bookmark_and_docs():
