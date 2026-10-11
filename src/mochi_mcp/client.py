@@ -46,6 +46,12 @@ class MochiClient:
             params = {"bookmark": bookmark}
         return results
 
+    def get_top_level_decks(self) -> list[dict]:
+        """
+        Return all the decks which sit at the top level of the user's Mochi library.
+        """
+        return [deck for deck in self.list_decks() if 'parent-id' not in deck]
+
     def list_cards(self, deck_id: str | None = None) -> list[dict]:
         results: list[dict] = []
         params: dict = {}
