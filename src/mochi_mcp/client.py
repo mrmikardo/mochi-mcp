@@ -30,12 +30,21 @@ class MochiClient:
             ) from e
 
     def get_deck(self, deck_id: str) -> dict:
+        """
+        Get a single deck by ID.
+        """
         return self._get(f"decks/{deck_id}")
 
     def get_card(self, card_id: str) -> dict:
+        """
+        Get a single card by ID.
+        """
         return self._get(f"cards/{card_id}")
 
     def list_decks(self) -> list[dict]:
+        """
+        List all of a user's decks.
+        """
         results: list[dict] = []
         params: dict = {}
         while True:
@@ -55,6 +64,9 @@ class MochiClient:
         return [deck for deck in self.list_decks() if "parent-id" not in deck]
 
     def list_cards(self, deck_id: str | None = None) -> list[dict]:
+        """
+        List all of a user's cards, optionally filtered by deck.
+        """
         results: list[dict] = []
         params: dict = {}
         if deck_id:
