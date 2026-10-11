@@ -76,7 +76,9 @@ class Review(MochiModel):
 
 class CardField(MochiModel):
     id: str
-    value: str
+    value: str | None = Field(
+        default=None, description="Null when the field has been left empty."
+    )
 
 
 class Card(MochiModel):

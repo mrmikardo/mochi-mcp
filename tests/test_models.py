@@ -96,6 +96,14 @@ def test_review_duration_is_optional():
     assert card.reviews[0].duration is None
 
 
+def test_card_field_value_can_be_null():
+    # Seen from the live API for template fields left empty; not in the docs.
+    card = Card.model_validate(
+        {**CARD_JSON, "fields": {"name": {"id": "name", "value": None}}}
+    )
+    assert card.fields["name"].value is None
+
+
 def test_unknown_keys_are_preserved():
     deck = Deck.model_validate({"id": "d1", "name": "Spanish", "new-api-field": 1})
     assert deck.model_dump(by_alias=True)["new-api-field"] == 1
