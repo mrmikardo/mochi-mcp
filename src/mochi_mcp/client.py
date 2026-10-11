@@ -45,12 +45,16 @@ class MochiClient:
         """
         return self._get(f"cards/{card_id}")
 
-    def list_decks(self) -> list[dict]:
+    def list_decks(self, *, include_archived: bool = False) -> list[dict]:
         """
         List all of a user's decks.
+
+        Args:
+            include_archived: whether to include archived decks in the returned set.
         """
         results: list[dict] = []
         params: dict = {}
+
         while True:
             data = self._get("decks", params=params)
             docs = data.get("docs", [])
@@ -59,6 +63,10 @@ class MochiClient:
             if not docs or not bookmark:
                 break
             params = {"bookmark": bookmark}
+
+        if not include_archived:
+            return list(filter(lambda d: "archived?" not in d, results))
+
         return results
 
     def get_top_level_decks(self) -> list[dict]:

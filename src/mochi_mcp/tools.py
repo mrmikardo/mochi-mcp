@@ -5,9 +5,9 @@ from mochi_mcp.client import MochiClient
 
 def register_tools(mcp: FastMCP, client: MochiClient) -> None:
     @mcp.tool
-    def list_decks() -> list[dict]:
+    def list_decks(include_archived: bool = False) -> list[dict]:
         """List all Mochi decks."""
-        return client.list_decks()
+        return client.list_decks(include_archived=include_archived)
 
     @mcp.tool
     def get_deck(deck_id: str) -> dict:
