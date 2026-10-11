@@ -38,6 +38,28 @@ uv sync
 MOCHI_API_KEY=your-key uv run mochi-mcp
 ```
 
+### Dev with inspector
+
+The [MCP inspector](https://github.com/modelcontextprotocol/inspector) is an extremely useful tool for local dev, as it
+allows you to list and view the tools in a satisfying GUI. If you're
+doing local dev work on this server, it's strongly recommended that you
+use the inspector.
+
+To run the inspector, you should do
+
+```bash
+cp mcp_debug_config.template.json mcp_debug_config.json
+
+```
+
+and then fill in the relevant environment variables (see above).
+
+You can then run the inspector:
+
+```bash
+npx @modelcontextprotocol/inspector --config mcp_debug_config.json --server mochi-mcp
+```
+
 ## Requirements
 
 - Python 3.11+
