@@ -28,8 +28,9 @@ htmlcov/
 .idea/
 .DS_Store
 
-# Claude Code local settings
+# Claude Code
 .claude/settings.local.json
+.claude/worktrees
 
 # FastMCP debug server settings (contains API key)
 mcp_debug_config.json
