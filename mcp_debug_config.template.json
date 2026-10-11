@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "hk-wagtail-mcp": {
+      "command": "uv",
+      "args": ["run", "mochi-mcp"],
+      "env": {
+        "MOCHI_API_KEY":"",
+      }
+    }
+  }
+}

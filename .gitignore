@@ -30,3 +30,6 @@ htmlcov/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# FastMCP debug server settings (contains API key)
+mcp_debug_config.json
