@@ -20,6 +20,7 @@ packages = ["src/mochi_mcp"]
 
 [dependency-groups]
 dev = [
+    "prek>=0.5.5",
     "pytest",
 ]
 
