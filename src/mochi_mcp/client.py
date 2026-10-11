@@ -3,6 +3,10 @@ import httpx
 BASE_URL = "https://app.mochi.cards/api/"
 
 
+class MochiClientException(Exception):
+    pass
+
+
 class MochiClient:
     def __init__(
         self, api_key: str, transport: httpx.BaseTransport | None = None
@@ -25,7 +29,7 @@ class MochiClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            raise Exception(
+            raise MochiClientException(
                 f"Mochi API returned {e.response.status_code}: {e.response.text}"
             ) from e
 
