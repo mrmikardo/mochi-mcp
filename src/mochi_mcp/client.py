@@ -4,7 +4,9 @@ BASE_URL = "https://app.mochi.cards/api/"
 
 
 class MochiClient:
-    def __init__(self, api_key: str, transport: httpx.BaseTransport | None = None) -> None:
+    def __init__(
+        self, api_key: str, transport: httpx.BaseTransport | None = None
+    ) -> None:
         self._http = httpx.Client(
             base_url=BASE_URL,
             auth=(api_key, ""),
@@ -50,7 +52,7 @@ class MochiClient:
         """
         Return all the decks which sit at the top level of the user's Mochi library.
         """
-        return [deck for deck in self.list_decks() if 'parent-id' not in deck]
+        return [deck for deck in self.list_decks() if "parent-id" not in deck]
 
     def list_cards(self, deck_id: str | None = None) -> list[dict]:
         results: list[dict] = []

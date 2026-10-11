@@ -54,11 +54,13 @@ def test_list_decks_returns_all_decks_single_page():
 
 
 def test_list_decks_paginates_through_all_pages():
-    client, _ = make_client([
-        {"json": {"docs": [{"id": "d1"}], "bookmark": "cursor1"}},
-        {"json": {"docs": [{"id": "d2"}], "bookmark": "cursor2"}},
-        {"json": {"docs": [{"id": "d3"}]}},
-    ])
+    client, _ = make_client(
+        [
+            {"json": {"docs": [{"id": "d1"}], "bookmark": "cursor1"}},
+            {"json": {"docs": [{"id": "d2"}], "bookmark": "cursor2"}},
+            {"json": {"docs": [{"id": "d3"}]}},
+        ]
+    )
     assert client.list_decks() == [{"id": "d1"}, {"id": "d2"}, {"id": "d3"}]
 
 
@@ -75,10 +77,12 @@ def test_list_cards_passes_deck_id_filter():
 
 
 def test_list_cards_paginates_with_deck_filter_preserved():
-    client, transport = make_client([
-        {"json": {"docs": [{"id": "c1"}], "bookmark": "cursor1"}},
-        {"json": {"docs": [{"id": "c2"}]}},
-    ])
+    client, transport = make_client(
+        [
+            {"json": {"docs": [{"id": "c1"}], "bookmark": "cursor1"}},
+            {"json": {"docs": [{"id": "c2"}]}},
+        ]
+    )
     result = client.list_cards(deck_id="deck-1")
     assert result == [{"id": "c1"}, {"id": "c2"}]
     assert transport.requests[1].url.params.get("deck-id") == "deck-1"
