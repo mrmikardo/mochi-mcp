@@ -24,6 +24,7 @@ class DeckNode:
 
 class MochiClient:
     _deck_tree: DeckNode | None
+    _deck_id_name_map: dict[str, str]
 
     def __init__(
         self, api_key: str, transport: httpx.BaseTransport | None = None
@@ -34,6 +35,7 @@ class MochiClient:
             transport=transport,
         )
         self._deck_tree = None
+        self._deck_id_name_map = {}
 
     def __enter__(self):
         return self
@@ -132,6 +134,10 @@ class MochiClient:
         if not self._deck_tree:
             self._build_deck_tree(decks)
 
+        if not self._deck_id_name_map:
+            for deck in decks:
+                self._deck_id_name_map[deck.id] = deck.name
+
         if not include_archived:
             return [deck for deck in decks if not deck.archived]
         return decks
@@ -151,6 +157,11 @@ class MochiClient:
         if deck := self._find(self._deck_tree, deck_id):
             return [child.id for child in deck.children]
         return []
+
+    def get_deck_name_by_id(self, deck_id: str) -> str | None:
+        if not self._deck_id_name_map:
+            self.list_decks()
+        return self._deck_id_name_map.get(deck_id)
 
     def list_cards(self, deck_id: str | None = None) -> list[Card]:
         """
