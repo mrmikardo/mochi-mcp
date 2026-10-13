@@ -3,7 +3,7 @@ import base64
 import httpx
 import pytest
 
-from mochi_mcp.client import MochiClient, MochiClientException
+from mochi_mcp.client import ROOT_NODE_ID, MochiClient, MochiClientException
 from mochi_mcp.models import Card, Deck
 
 
@@ -155,7 +155,7 @@ def test_list_decks_constructs_tree():
     client.list_decks()
 
     assert client._deck_tree is not None
-    assert client._deck_tree.id == "ROOT"
+    assert client._deck_tree.id == ROOT_NODE_ID
 
     assert [n.id for n in client._deck_tree.children] == ["d1"]
 

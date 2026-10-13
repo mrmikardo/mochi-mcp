@@ -7,6 +7,7 @@ from pydantic import BaseModel, ValidationError
 from mochi_mcp.models import Card, Deck, Page
 
 BASE_URL = "https://app.mochi.cards/api/"
+ROOT_NODE_ID = "ROOT"
 
 M = TypeVar("M", bound=BaseModel)
 
@@ -46,14 +47,14 @@ class MochiClient:
         """
 
         def build(node_id: str) -> DeckNode:
-            parent_id = None if node_id == "ROOT" else node_id
+            parent_id = None if node_id == ROOT_NODE_ID else node_id
             node = DeckNode(node_id)
             for inp in decks:
                 if inp.parent_id == parent_id:
                     node.children.append(build(inp.id))
             return node
 
-        self._deck_tree = build("ROOT")
+        self._deck_tree = build(ROOT_NODE_ID)
 
     def _get(self, path: str, params: dict | None = None) -> dict:
         try:
