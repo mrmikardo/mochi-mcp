@@ -11,6 +11,18 @@ MCP server for the [Mochi Cards](https://mochi.cards) API. Provides read access 
 | `list_cards` | List all cards (optionally filtered by `deck_id`) |
 | `get_card` | Get a single card by ID |
 
+## Skills
+
+The `skills/` directory contains a list of useful skills which leverage
+the MCP server. At the time of writing, the set of skills is the
+following:
+
+- `drill` - get Claude to drill you on your cards, optionally rewriting
+  the faces to improve recall.
+
+In order to use these skills, you'll want to copy and paste the relevant
+SKILL.md file into Claude.
+
 ## Setup
 
 ### Claude Desktop
