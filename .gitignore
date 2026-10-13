@@ -34,3 +34,6 @@ htmlcov/
 
 # FastMCP debug server settings (contains API key)
 mcp_debug_config.json
+
+# Scratch file
+src/mochi_mcp/scratch.py

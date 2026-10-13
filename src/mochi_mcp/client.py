@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import TypeVar
 
 import httpx
@@ -6,6 +7,7 @@ from pydantic import BaseModel, ValidationError
 from mochi_mcp.models import Card, Deck, Page
 
 BASE_URL = "https://app.mochi.cards/api/"
+ROOT_NODE_ID = "ROOT"
 
 M = TypeVar("M", bound=BaseModel)
 
@@ -14,7 +16,16 @@ class MochiClientException(Exception):
     pass
 
 
+@dataclass
+class DeckNode:
+    id: str
+    children: list["DeckNode"] = field(default_factory=list)
+
+
 class MochiClient:
+    _deck_tree: DeckNode | None
+    _deck_id_name_map: dict[str, str]
+
     def __init__(
         self, api_key: str, transport: httpx.BaseTransport | None = None
     ) -> None:
@@ -23,12 +34,41 @@ class MochiClient:
             auth=(api_key, ""),
             transport=transport,
         )
+        self._deck_tree = None
+        self._deck_id_name_map = {}
 
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         self._http.close()
+
+    def _build_deck_tree(self, decks: list[Deck]) -> None:
+        """
+        TODO.
+        """
+
+        def build(node_id: str) -> DeckNode:
+            parent_id = None if node_id == ROOT_NODE_ID else node_id
+            node = DeckNode(node_id)
+            for inp in decks:
+                if inp.parent_id == parent_id:
+                    node.children.append(build(inp.id))
+            return node
+
+        self._deck_tree = build(ROOT_NODE_ID)
+
+    def _find(self, node: DeckNode, target_id: str) -> DeckNode | None:
+        """
+        Find target_id in the tree.
+        """
+        if node.id == target_id:
+            return node
+        for child in node.children:
+            result = self._find(child, target_id)
+            if result is not None:
+                return result
+        return None
 
     def _get(self, path: str, params: dict | None = None) -> dict:
         try:
@@ -82,6 +122,22 @@ class MochiClient:
             include_archived: whether to include archived decks in the returned set.
         """
         decks = self._paginate("decks", Deck)
+
+        # TODO: an issue with this approach is that it will get stale.
+        # I think that's fine for now as the client doesn't expose any
+        # mechanisms to update decks, so staleness would only creep in
+        # if a user is editing their decks via the Mochi app in the
+        # background: nevertheless, this requires some thought.
+        # Also worth considering if the return value of this function is
+        # just more usefully the tree itself, rather than the flat list
+        # of Decks.
+        if not self._deck_tree:
+            self._build_deck_tree(decks)
+
+        if not self._deck_id_name_map:
+            for deck in decks:
+                self._deck_id_name_map[deck.id] = deck.name
+
         if not include_archived:
             return [deck for deck in decks if not deck.archived]
         return decks
@@ -91,6 +147,21 @@ class MochiClient:
         Return all the decks which sit at the top level of the user's Mochi library.
         """
         return [deck for deck in self.list_decks() if deck.parent_id is None]
+
+    def get_subdeck_ids(self, deck_id: str) -> list[str]:
+        """
+        Return all the decks which sit directly below a given deck.
+        """
+        if not self._deck_tree:
+            self.list_decks()
+        if deck := self._find(self._deck_tree, deck_id):
+            return [child.id for child in deck.children]
+        return []
+
+    def get_deck_name_by_id(self, deck_id: str) -> str | None:
+        if not self._deck_id_name_map:
+            self.list_decks()
+        return self._deck_id_name_map.get(deck_id)
 
     def list_cards(self, deck_id: str | None = None) -> list[Card]:
         """
