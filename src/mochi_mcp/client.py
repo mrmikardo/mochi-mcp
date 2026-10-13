@@ -126,6 +126,9 @@ class MochiClient:
         # mechanisms to update decks, so staleness would only creep in
         # if a user is editing their decks via the Mochi app in the
         # background: nevertheless, this requires some thought.
+        # Also worth considering if the return value of this function is
+        # just more usefully the tree itself, rather than the flat list
+        # of Decks.
         if not self._deck_tree:
             self._build_deck_tree(decks)
 
