@@ -56,6 +56,18 @@ class MochiClient:
 
         self._deck_tree = build(ROOT_NODE_ID)
 
+    def _find(self, node: DeckNode, target_id: str) -> DeckNode | None:
+        """
+        Find target_id in the tree.
+        """
+        if node.id == target_id:
+            return node
+        for child in node.children:
+            result = self._find(child, target_id)
+            if result is not None:
+                return result
+        return None
+
     def _get(self, path: str, params: dict | None = None) -> dict:
         try:
             response = self._http.get(path, params=params or {})
@@ -126,6 +138,16 @@ class MochiClient:
         Return all the decks which sit at the top level of the user's Mochi library.
         """
         return [deck for deck in self.list_decks() if deck.parent_id is None]
+
+    def get_subdeck_ids(self, deck_id: str) -> list[str]:
+        """
+        Return all the decks which sit directly below a given deck.
+        """
+        if not self._deck_tree:
+            self.list_decks()
+        if deck := self._find(self._deck_tree, deck_id):
+            return [child.id for child in deck.children]
+        return []
 
     def list_cards(self, deck_id: str | None = None) -> list[Card]:
         """
