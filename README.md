@@ -22,14 +22,19 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "mochi": {
       "command": "uvx",
-      "args": ["mochi-mcp"],
+      "args": [
+        "--directory",
+        "path/to/project root",
+        "run",
+        "mochi-mcp"
+      ],
       "env": { "MOCHI_API_KEY": "your-api-key-here" }
     }
   }
 }
 ```
 
-Your Mochi API key is in [Mochi Settings → API](https://app.mochi.cards/settings).
+Your Mochi API key can be found under [Mochi Settings → API](https://app.mochi.cards/settings).
 
 ### Development
 
