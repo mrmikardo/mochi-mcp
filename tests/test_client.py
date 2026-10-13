@@ -140,3 +140,26 @@ def test_malformed_response_raises_client_exception():
     client, _ = make_client([{"json": {"name": "no id"}}])
     with pytest.raises(MochiClientException, match="Unexpected response"):
         client.get_deck("d1")
+
+
+TREE_DECKS = [
+    {"id": "d1", "name": "Top Level"},
+    {"id": "d2", "name": "Child 1", "parent-id": "d1"},
+    {"id": "d3", "name": "Child 2", "parent-id": "d1"},
+    {"id": "d4", "name": "Child 2-1", "parent-id": "d2"},
+]
+
+
+def test_list_decks_constructs_tree():
+    client, _ = make_client([{"json": {"docs": TREE_DECKS}}])
+    client.list_decks()
+
+    assert client._deck_tree is not None
+    assert client._deck_tree.id == "ROOT"
+
+    assert [n.id for n in client._deck_tree.children] == ["d1"]
+
+    expected_d1_children_ids = ["d2", "d3"]
+    assert [
+        n.id for n in client._deck_tree.children[0].children
+    ] == expected_d1_children_ids

@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import TypeVar
 
 import httpx
@@ -14,7 +15,15 @@ class MochiClientException(Exception):
     pass
 
 
+@dataclass
+class DeckNode:
+    id: str
+    children: list["DeckNode"] = field(default_factory=list)
+
+
 class MochiClient:
+    _deck_tree: DeckNode | None
+
     def __init__(
         self, api_key: str, transport: httpx.BaseTransport | None = None
     ) -> None:
@@ -23,12 +32,28 @@ class MochiClient:
             auth=(api_key, ""),
             transport=transport,
         )
+        self._deck_tree = None
 
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         self._http.close()
+
+    def _build_deck_tree(self, decks: list[Deck]) -> None:
+        """
+        TODO.
+        """
+
+        def build(node_id: str) -> DeckNode:
+            parent_id = None if node_id == "ROOT" else node_id
+            node = DeckNode(node_id)
+            for inp in decks:
+                if inp.parent_id == parent_id:
+                    node.children.append(build(inp.id))
+            return node
+
+        self._deck_tree = build("ROOT")
 
     def _get(self, path: str, params: dict | None = None) -> dict:
         try:
@@ -82,6 +107,15 @@ class MochiClient:
             include_archived: whether to include archived decks in the returned set.
         """
         decks = self._paginate("decks", Deck)
+
+        # TODO: an issue with this approach is that it will get stale.
+        # I think that's fine for now as the client doesn't expose any
+        # mechanisms to update decks, so staleness would only creep in
+        # if a user is editing their decks via the Mochi app in the
+        # background: nevertheless, this requires some thought.
+        if not self._deck_tree:
+            self._build_deck_tree(decks)
+
         if not include_archived:
             return [deck for deck in decks if not deck.archived]
         return decks
